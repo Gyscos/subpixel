@@ -17,6 +17,8 @@ Iterating
 Now saving image as ~/screenshot.png.subs.png
 ```
 
+Performance-wise, it takes ~0.7s to process a 1080p screenshot on a i7-4790K.
+
 Here are before/after images (scaled to have the same size):
 
 ![before](https://raw.github.com/Gyscos/subpixel/master/doc/before.png)

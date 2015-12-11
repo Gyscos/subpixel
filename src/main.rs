@@ -62,7 +62,7 @@ fn main() {
         Some(text) => Pattern::new(&text),
     };
 
-    println!("Loading file {}", text);
+    println!("Loading file {}", filename);
     let source = image::open(&Path::new(&filename)).unwrap();
 
     let (w,h) = source.dimensions();

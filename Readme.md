@@ -10,17 +10,17 @@ cargo build --release
 Example usage:
 ```
 $ target/release/subpixel ~/screenshot.png
-Loading ~/screenshot.png
-Loading file...
+Loading file ~/screenshot.png
 Creating blank canvas
-Iterating...
+Iterating
 ....................
-Now saving image as ~/screenshot.png.subs.png...
+Now saving image as ~/screenshot.png.subs.png
 ```
 
 Here are before/after images (scaled to have the same size):
 
 ![before](https://raw.github.com/Gyscos/subpixel/master/doc/before.png)
+
 ![after](https://raw.github.com/Gyscos/subpixel/master/doc/after.png)
 
 

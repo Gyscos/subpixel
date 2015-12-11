@@ -13,7 +13,7 @@ impl Pattern {
     fn new(string: &str) -> Self {
         match string {
             "rgb" | "RGB" => Pattern::RGB,
-            _ => panic!("Unrecognized pattern"),
+            _ => panic!("Unrecognized pattern: `{}`", string),
         }
     }
 
@@ -54,15 +54,15 @@ fn main() {
         None => {
             panic!("No file given");
         },
-        Some(text) => { println!("Loading {}", text); text },
+        Some(text) => text,
     };
 
     let pattern = match args.next() {
         None => Pattern::RGB,
-        Some(text) => { println!("Parsing {}", text); Pattern::new(&text) },
+        Some(text) => Pattern::new(&text),
     };
 
-    println!("Loading file...");
+    println!("Loading file {}", text);
     let source = image::open(&Path::new(&filename)).unwrap();
 
     let (w,h) = source.dimensions();
@@ -79,7 +79,7 @@ fn main() {
     println!("Creating blank canvas");
     let mut target = image::ImageBuffer::new(w, h);
 
-    println!("Iterating...");
+    println!("Iterating");
     for (k,(x,y,pixel)) in source.pixels().enumerate() {
 
         let x = x * size;
@@ -102,7 +102,7 @@ fn main() {
     }
     println!("");
     let target_filename = format!("{}.subs.png", filename);
-    println!("Now saving image as {}...", target_filename);
+    println!("Now saving image as {}", target_filename);
 
     let _ = target.save(&target_filename).unwrap();
 }

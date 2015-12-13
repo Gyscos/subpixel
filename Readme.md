@@ -25,11 +25,12 @@ Now saving image as screenshot.png.rgbw.png
 
 Performance-wise, it takes ~0.33s to process a 1080p screenshot into RGB on a i7-4790K.
 
-Here are before/after images (scaled to have the same size):
+Here are before/after images, scaled to have the same size (blurriness comes from browser upscaling):
 
-![before](https://raw.github.com/Gyscos/subpixel/master/doc/before.png)
+<img src="doc/screenshot.png" alt="Original Image", width="420" style="image-rendering: pixelated;" />
 
-![after](https://raw.github.com/Gyscos/subpixel/master/doc/after.png)
+<img src="doc/screenshot.png.rgb.png" alt="RGB pattern", width="420" />
 
+<img src="doc/screenshot.png.rgbw.png" alt="RGBW pattern", width="420" />
 
-Support for other pixel patterns (BGR, pentile, RGBW, ...) is currently not supported, but easy to add.
+Support for more subpixel pattern should be easy to implement, PR are welcome!

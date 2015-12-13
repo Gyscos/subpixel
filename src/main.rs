@@ -76,6 +76,13 @@ impl Pattern for RGBW {
             };
             target[(2*x+1,2*y+0)] = w;
             target[(2*x+1,2*y+1)] = w;
+            if x == 0 {
+                let b = image::Rgba {
+                    data: [0, 0, brightness, rgb[3]],
+                };
+                target[(2*x+0,2*y+0)] = b;
+                target[(2*x+0,2*y+1)] = b;
+            }
         } else {
             let (r,g,b) = split_rgb(rgb);
             for j in 0..2 {

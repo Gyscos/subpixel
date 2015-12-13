@@ -1,45 +1,91 @@
 extern crate image;
 
 use std::env;
+use std::io;
+use std::io::Write;
 use std::path::Path;
 
 use image::GenericImage;
 
-trait Pattern {
-    fn size(&self) -> u32;
-    fn slice(&self, rgb: &[u8; 4]) -> Vec<image::Rgba<u8>>;
+type Pixel = image::Rgba<u8>;
+type Container = Vec<u8>;
+
+fn split_rgb(rgba: &[u8; 4]) -> (Pixel, Pixel, Pixel) {
+    let r = image::Rgba{
+        data: [rgba[0],0,0,rgba[3]],
+    };
+    let g = image::Rgba{
+        data: [0,rgba[1],0,rgba[3]],
+    };
+    let b = image::Rgba{
+        data: [0,0,rgba[2],rgba[3]],
+    };
+
+    (r,g,b)
 }
 
-// Currently only one pattern is implemented: RGB
+
+trait Pattern {
+    fn size(&self) -> u32;
+    fn slice(&self, x: u32, y: u32, rgb: &[u8; 4], target: &mut image::ImageBuffer<Pixel, Container>);
+}
+
+// Most common pattern: simple RGB
 struct RGB;
 impl Pattern for RGB {
     fn size(&self) -> u32 {
         3
     }
 
-    fn slice(&self, rgb: &[u8; 4]) -> Vec<image::Rgba<u8>> {
-        let r = image::Rgba{
-            data: [rgb[0],0,0,rgb[3]],
-        };
-        let g = image::Rgba{
-            data: [0,rgb[1],0,rgb[3]],
-        };
-        let b = image::Rgba{
-            data: [0,0,rgb[2],rgb[3]],
-        };
+    fn slice(&self, x: u32, y: u32, rgb: &[u8; 4], target: &mut image::ImageBuffer<Pixel, Container>) {
+
+        let (r,g,b) = split_rgb(rgb);
 
         // We return a square, three times the same row: r,g,b
-        vec![r,g,b,
-             r,g,b,
-             r,g,b]
+        for j in 0..3 {
+            target[(3*x+0, 3*y+j)] = r;
+            target[(3*x+1, 3*y+j)] = g;
+            target[(3*x+2, 3*y+j)] = b;
+        }
+    }
+}
+
+// Pentile RGBW pattern, found on some hidpi screens
+struct RGBW;
+impl Pattern for RGBW {
+    fn size(&self) -> u32 {
+        2
+    }
+
+    fn slice(&self, x: u32, y: u32, rgb: &[u8; 4], target: &mut image::ImageBuffer<Pixel, Container>) {
+        let short = (x+y)%2 == 1;
+        if short {
+            // Get brightness from the pixel?
+            let brightness = rgb[0]/3+rgb[1]/3+rgb[2]/3;
+            let w = image::Rgba{
+                data: [brightness, brightness, brightness, rgb[3]],
+            };
+            target[(2*x+1,2*y+0)] = w;
+            target[(2*x+1,2*y+1)] = w;
+        } else {
+            let (r,g,b) = split_rgb(rgb);
+            for j in 0..2 {
+                target[(2*x+0,2*y+j)] = r;
+                target[(2*x+1,2*y+j)] = g;
+                if 2*x+2 < target.width() {
+                    target[(2*x+2,2*y+j)] = b;
+                }
+            }
+        }
     }
 }
 
 fn parse_pattern(string: &str) -> Box<Pattern> {
-    Box::new(match string {
-        "RGB" | "rgb" => RGB,
+    match string {
+        "RGB" | "rgb" => Box::new(RGB),
+        "RGBW" | "rgbw" => Box::new(RGBW),
         _ => panic!("Unrecognized pattern: {}", string),
-    })
+    }
 }
 
 fn main() {
@@ -50,7 +96,7 @@ fn main() {
     // First mandatory argument is the input image filename
     let filename = match args.next() {
         None => {
-            panic!("No file given. Usage: {} FILE", binary);
+            panic!("No file given. Usage: {} FILE [RGB|RGBW]", binary);
         },
         Some(text) => text,
     };
@@ -82,26 +128,13 @@ fn main() {
     println!("Iterating");
     for (k,(x,y,pixel)) in source.pixels().enumerate() {
 
-        // Scale from source to target coordinates
-        let x = x * size;
-        let y = y * size;
-
         // result is a size*size square of pixels, in row-major.
-        let result = pattern.slice(&pixel.data);
-
-        // Blitz it into the target image.
-        for i in 0..size {
-            let x = x+i;
-            for j in 0..size {
-                let y = y+j;
-
-                target[(x,y)] = result[(i + size * j) as usize];
-            }
-        }
+        pattern.slice(x, y, &pixel.data, &mut target);
 
         // Trivial progress indicator
         if k % dot_every == 0 {
             print!(".");
+            io::stdout().flush().expect("Could not flush?!?");
         }
     }
     println!("");

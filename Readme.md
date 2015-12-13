@@ -9,15 +9,21 @@ cargo build --release
 
 Example usage:
 ```
-$ target/release/subpixel ~/screenshot.png
-Loading file ~/screenshot.png
-Creating blank canvas
+$ target/release/subpixel screenshot.png
+Loading file screenshot.png
+Creating blank canvas: 5760 x 3240
 Iterating
 ....................
-Now saving image as ~/screenshot.png.subs.png
+Now saving image as screenshot.png.rgb.png
+$ target/release/subpixel screenshot.png rgbw
+Loading file screenshot.png
+Creating blank canvas: 3840 x 2160
+Iterating
+....................
+Now saving image as screenshot.png.rgbw.png
 ```
 
-Performance-wise, it takes ~0.7s to process a 1080p screenshot on a i7-4790K.
+Performance-wise, it takes ~0.33s to process a 1080p screenshot into RGB on a i7-4790K.
 
 Here are before/after images (scaled to have the same size):
 

@@ -27,6 +27,7 @@ fn split_rgb(rgba: &[u8; 4]) -> (Pixel, Pixel, Pixel) {
 
 trait Pattern {
     fn size(&self) -> u32;
+    fn name(&self) -> &'static str;
     fn slice(&self, x: u32, y: u32, rgb: &[u8; 4], target: &mut image::ImageBuffer<Pixel, Container>);
 }
 
@@ -35,6 +36,10 @@ struct RGB;
 impl Pattern for RGB {
     fn size(&self) -> u32 {
         3
+    }
+
+    fn name(&self) -> &'static str {
+        "rgb"
     }
 
     fn slice(&self, x: u32, y: u32, rgb: &[u8; 4], target: &mut image::ImageBuffer<Pixel, Container>) {
@@ -55,6 +60,10 @@ struct RGBW;
 impl Pattern for RGBW {
     fn size(&self) -> u32 {
         2
+    }
+
+    fn name(&self) -> &'static str {
+        "rgbw"
     }
 
     fn slice(&self, x: u32, y: u32, rgb: &[u8; 4], target: &mut image::ImageBuffer<Pixel, Container>) {
@@ -140,7 +149,7 @@ fn main() {
     println!("");
 
     // Aaand we're done.
-    let target_filename = format!("{}.subs.png", filename);
+    let target_filename = format!("{}.{}.png", filename, pattern.name());
     println!("Now saving image as {}", target_filename);
 
     let _ = target.save(&target_filename).unwrap();

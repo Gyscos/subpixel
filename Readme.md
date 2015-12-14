@@ -23,7 +23,7 @@ Iterating
 Now saving image as screenshot.png.rgbw.png
 ```
 
-Performance-wise, it takes ~0.33s to process a 1080p screenshot into RGB on a i7-4790K.
+Performance-wise, it takes ~0.33s to process a 1080p screenshot into RGB on a i5-4690K.
 
 Here are before/after images, scaled to have the same size (blurriness comes from browser upscaling):
 
